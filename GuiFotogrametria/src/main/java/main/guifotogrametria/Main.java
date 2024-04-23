@@ -17,7 +17,7 @@ public class Main extends Application {
 
         stage.setScene(scene);
         stage.setTitle("Fotka");
-        stage.getIcons().add(new Image("/OIG3.jpg"));
+//        stage.getIcons().add(new Image("/OIG3.jpg"));
         stage.show();
     }
 
