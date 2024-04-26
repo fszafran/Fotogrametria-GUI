@@ -11,8 +11,7 @@ import java.net.URL;
 import java.util.*;
 
 public class FirstSceneController implements Initializable {
-    @FXML
-    private Button submitButton;
+
     @FXML
     private ComboBox<String> planeComboBox;
     @FXML
@@ -32,45 +31,79 @@ public class FirstSceneController implements Initializable {
     @FXML
     private TextField GSDText;
     final private double kmToMs = (double) 1000 / 3600;
-    private int GSD;
+    private double GSD;
     private double Dx;
     private double Dy;
-    private float f;
-    private int lx;
-    private int ly;
-    private int p;
-    private int q;
-    private int Hmax;
-    private int Hmin;
+    private double p = 60;
+    private double q = 30;
+    private double f;
     private double nX;
     private double nY;
     private double deltaTime;
-    private float px;
-    private float cyklPracy;
+    private double px;
+    private double cyklPracy;
     private double maxPlaneLevel;
     private double absoluteHeight;
     final private Map<String, double[]> cameraMap = new HashMap<>();
     final private Map<String, double[]> planeMap = new HashMap<>();
-
+    private boolean northSouth;
+    private int liczbaZdjec;
     double[] getDParams(double Xp, double Yp, double Xl, double Yl){
-        double Dx = Xp - Xl;
-        double Dy = Yl - Yp; // może na odwrót
+        double Dx = Math.abs(Xp - Xl);
+        double Dy = Math.abs(Yl - Yp); // może na odwrót
+        if(Dx>Dy){
+            this.northSouth = false;
+        }
+        else{
+            this.northSouth = true;
+        }
+
         return new double[]{Dx,Dy};
     }
     double getAbsoluteHeight(double GSD, double f, double px, double hMax, double hMin){
         double height = (GSD *f)/px;
+        System.out.println("GSD w funkcji: "+GSD);
+        System.out.println("f w funkcji: "+f);
+        System.out.println("px w funkcji: "+px);
+        System.out.println("W"+height);
         double averageHeight = (hMax+hMin)/2;
+        System.out.println("Wavg"+height);
         return height+averageHeight;
     }
     double[] getNParams(double GSD, double lx, double ly, double p, double q, double Dx, double Dy, double v){
         double Lx = lx *GSD;
+        System.out.println("Lx:"+Lx);
         double Ly = ly *GSD;
+        System.out.println("p: "+p);
+        System.out.println("q: "+q);
+
+        System.out.println("Ly:"+Ly);
         double Bx = Lx * (100-p)/100;
+        System.out.println("Bx: "+Bx);
         double By = Ly * (100-q)/100;
+        System.out.println("By: "+By);
         double Ny = Dy /By;
-        double Nx = Dx /Bx +4;
+        double Nx = Dx /Bx + 4;
+        double roofNy = Math.ceil(Ny);
+        double roofNx = Math.ceil(Nx);
+        System.out.println("Dx: "+ Dx);
+        System.out.println("Dy: "+Dy);
+        System.out.println("Nx: "+ Nx);
+        System.out.println("Ny: "+Ny);
+        System.out.println("roofNx: "+ roofNx);
+        System.out.println("roofNy: "+roofNy);
+        double calculatedQ = -((Dy*100)/(roofNy*Ly)-100);
+        double calculatedP = -((Dx*100)/((roofNx-4)*Lx)-100);
+        System.out.println("Nowe Q: "+ calculatedQ);
+        System.out.println("Nowe P: "+ calculatedP);
+        calculatedQ = Math.floor(calculatedQ * 10) / 10.0; // Truncate to one decimal place
+        calculatedP = Math.floor(calculatedP * 10) / 10.0;
+        this.q = calculatedQ;
+        this.p = calculatedP;
+        System.out.println("Nowe Q: "+ this.q);
+        System.out.println("Nowe P: "+ this.p);
         double deltaTime = Bx/v;
-        return new double[]{Nx,Ny,deltaTime};
+        return new double[]{roofNx,roofNy,deltaTime};
     }
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -106,36 +139,44 @@ public class FirstSceneController implements Initializable {
     }
     public void submit(){
         try{
-            this.GSD = Integer.parseInt(GSDText.getText());
-            double Xp = Double.parseDouble(XPText.getText());
-            double Yp = Double.parseDouble(YPText.getText());
-            double Xl = Double.parseDouble(XLText.getText());
-            double Yl = Double.parseDouble(YLText.getText());
-            double[] dParams = getDParams(Xp, Yp, Xl, Yl);
-            this.Dx = dParams[0];
-            this.Dy = dParams[1];
+            this.GSD = Double.parseDouble(GSDText.getText())/100;
+            System.out.println("GSD"+this.GSD);
+//            double Xp = Double.parseDouble(XPText.getText());
+//            double Yp = Double.parseDouble(YPText.getText());
+//            double Xl = Double.parseDouble(XLText.getText());
+//            double Yl = Double.parseDouble(YLText.getText());
+//            double[] dParams = getDParams(Xp, Yp, Xl, Yl);
+//            this.Dx = dParams[0];
+//            this.Dy = dParams[1];
+            this.Dx = 19090;
+            this.Dy = 17219;
             double hMax = Double.parseDouble(hMaxText.getText());
             double hMin = Double.parseDouble(hMinText.getText());
-
-            //this.absoluteHeight = getAbsoluteHeight(this.GSD, this.f, this.px, hMax, hMin);
-
+            System.out.println("H"+hMin+" "+hMax);
             double[] chosenCamera = cameraMap.get(cameraComboBox.getValue());
             double[] chosenPlane = planeMap.get(planeComboBox.getValue());
             this.maxPlaneLevel = chosenPlane[2];
-            System.out.println(this.maxPlaneLevel);
-            System.out.println(this.absoluteHeight);
+            this.f = chosenCamera[3];
+            this.cyklPracy = chosenCamera[4];
+            this.px = chosenCamera[2];
+            System.out.println("pułap"+this.maxPlaneLevel);
+            this.absoluteHeight = getAbsoluteHeight(this.GSD, this.f, this.px, hMax, hMin);
+            System.out.println("Habs: "+this.absoluteHeight);
             if(this.absoluteHeight>this.maxPlaneLevel){
                 overLevelAlert();
             }
             double v = chosenPlane[1];
             double lx = chosenCamera[0];
             double ly = chosenCamera[1];
-            double p = 0.0;
-            double q = 0.0;
-            double[] nParams = getNParams(this.GSD, lx, ly, p, q, this.Dx, this.Dy, v);
+            double[] nParams = getNParams(this.GSD, ly, lx, this.p, this.q, this.Dx, this.Dy, v);
+//tu jest cos z lx ly - geodezja smierdzaca
             this.nX = nParams[0];
             this.nY = nParams[1];
-            this.deltaTime = nParams[2];
+            if(this.cyklPracy>nParams[2]){
+                showAlert("Przekroczono cykl pracy", "Delta t jest mniejsza od cyklu pracy");
+            }
+            this.liczbaZdjec = (int)(this.nX * this.nY);
+            System.out.println(liczbaZdjec);
         }
         catch (NullPointerException e){
             showAlert("Puste parametry","Uzupełnij wszystkie pola");
@@ -161,6 +202,6 @@ public class FirstSceneController implements Initializable {
         String[] cameras = cameraMap.keySet().toArray(new String[0]);
         cameraComboBox.getItems().addAll(cameras);
         planeComboBox.getItems().addAll(planes);
-        this.absoluteHeight = 5000;
+
     }
 }
