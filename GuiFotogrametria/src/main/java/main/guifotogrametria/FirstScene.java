@@ -1,16 +1,22 @@
 package main.guifotogrametria;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class FirstSceneController implements Initializable {
+public class FirstScene implements Initializable {
 
     @FXML
     private ComboBox<String> planeComboBox;
@@ -39,7 +45,9 @@ public class FirstSceneController implements Initializable {
     private double f;
     private double nX;
     private double nY;
-    private double deltaTime;
+    private double Bx;
+    private double By;
+    private double wspolczynnikEmpiryczny;
     private double px;
     private double cyklPracy;
     private double maxPlaneLevel;
@@ -48,6 +56,17 @@ public class FirstSceneController implements Initializable {
     final private Map<String, double[]> planeMap = new HashMap<>();
     private boolean northSouth;
     private int liczbaZdjec;
+    private String formattedTime;
+    public static FlightParams flightParams;
+    private Stage stage;
+    private Scene scene;
+    private Parent root;
+
+    String convertSeconds(double totalSecs){
+        int hours = (int) (totalSecs / 3600);
+        int minutes = (int) ((totalSecs % 3600) / 60);
+        return String.format("%02d h : %02d m", hours, minutes);
+    }
     double[] getDParams(double Xp, double Yp, double Xl, double Yl){
         double Dx = Math.abs(Xp - Xl);
         double Dy = Math.abs(Yl - Yp); // może na odwrót
@@ -60,6 +79,7 @@ public class FirstSceneController implements Initializable {
 
         return new double[]{Dx,Dy};
     }
+
     double getAbsoluteHeight(double GSD, double f, double px, double hMax, double hMin){
         double height = (GSD *f)/px;
         System.out.println("GSD w funkcji: "+GSD);
@@ -103,7 +123,7 @@ public class FirstSceneController implements Initializable {
         System.out.println("Nowe Q: "+ this.q);
         System.out.println("Nowe P: "+ this.p);
         double deltaTime = Bx/v;
-        return new double[]{roofNx,roofNy,deltaTime};
+        return new double[]{roofNx,roofNy,deltaTime,Bx,By};
     }
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -137,7 +157,7 @@ public class FirstSceneController implements Initializable {
         alert.setContentText("Proponowane modele: " + result.toString());
         alert.showAndWait();
     }
-    public void submit(){
+    public void submit(ActionEvent event) throws IOException {
         try{
             this.GSD = Double.parseDouble(GSDText.getText())/100;
             System.out.println("GSD"+this.GSD);
@@ -150,6 +170,8 @@ public class FirstSceneController implements Initializable {
 //            this.Dy = dParams[1];
             this.Dx = 19090;
             this.Dy = 17219;
+            this.Bx = 1414;
+            this.By = 2722;
             double hMax = Double.parseDouble(hMaxText.getText());
             double hMin = Double.parseDouble(hMinText.getText());
             System.out.println("H"+hMin+" "+hMax);
@@ -159,16 +181,18 @@ public class FirstSceneController implements Initializable {
             this.f = chosenCamera[3];
             this.cyklPracy = chosenCamera[4];
             this.px = chosenCamera[2];
+            double planeMaxSpeed = chosenPlane[1];
+            double planeMinSpeed = chosenPlane[0];
+            double averagePlaneSpeed = (planeMaxSpeed + planeMinSpeed)/2;
+            double lx = chosenCamera[0];
+            double ly = chosenCamera[1];
             System.out.println("pułap"+this.maxPlaneLevel);
             this.absoluteHeight = getAbsoluteHeight(this.GSD, this.f, this.px, hMax, hMin);
             System.out.println("Habs: "+this.absoluteHeight);
             if(this.absoluteHeight>this.maxPlaneLevel){
                 overLevelAlert();
             }
-            double v = chosenPlane[1];
-            double lx = chosenCamera[0];
-            double ly = chosenCamera[1];
-            double[] nParams = getNParams(this.GSD, ly, lx, this.p, this.q, this.Dx, this.Dy, v);
+            double[] nParams = getNParams(this.GSD, ly, lx, this.p, this.q, this.Dx, this.Dy, planeMaxSpeed);
 //tu jest cos z lx ly - geodezja smierdzaca
             this.nX = nParams[0];
             this.nY = nParams[1];
@@ -177,6 +201,30 @@ public class FirstSceneController implements Initializable {
             }
             this.liczbaZdjec = (int)(this.nX * this.nY);
             System.out.println(liczbaZdjec);
+            System.out.println(this.Bx + ", "+ this.By);
+            System.out.println(this.Dx + ", "+ this.Dy);
+
+            this.wspolczynnikEmpiryczny = this.liczbaZdjec * (this.Bx* this.By) / (this.Dx*this.Dy);
+            System.out.println("Wsp: "+this.wspolczynnikEmpiryczny);
+            // v = s/t -> t = s/v
+            if(!this.northSouth){
+                double totalDistance = this.Dx * this.nY;
+                double totalTime = totalDistance/averagePlaneSpeed + (this.nY-1)*((double) 140 /60);
+                this.formattedTime = convertSeconds(totalTime);
+                System.out.println("Czas"+ formattedTime);
+            }
+            else{
+                double totalDistance = this.Dy *this.nX;
+                double totalTime = totalDistance/averagePlaneSpeed + (this.nY-1)*((double) 140 /60);
+                this.formattedTime = convertSeconds(totalTime);
+
+            }
+            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.wspolczynnikEmpiryczny, this.formattedTime);
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
+            stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            scene=new Scene(root);
+            stage.setScene(scene);
+            stage.show();
         }
         catch (NullPointerException e){
             showAlert("Puste parametry","Uzupełnij wszystkie pola");
@@ -186,8 +234,6 @@ public class FirstSceneController implements Initializable {
         }
 
     }
-
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         cameraMap.put("Z/I DMC IIe 230", new double[]{15552,14144,5.6e-6, 92e-3, 1.8});
@@ -202,6 +248,5 @@ public class FirstSceneController implements Initializable {
         String[] cameras = cameraMap.keySet().toArray(new String[0]);
         cameraComboBox.getItems().addAll(cameras);
         planeComboBox.getItems().addAll(planes);
-
     }
 }
