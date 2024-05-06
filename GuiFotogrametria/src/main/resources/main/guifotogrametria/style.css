@@ -1,0 +1,38 @@
+.root {
+    -fx-background-color: #1a1a2e;
+}
+.label {
+    -fx-text-fill: white;
+}
+.button {
+    -fx-background-color: #fdaa7f;
+    -fx-text-fill: black;
+    -fx-border-width: 0;
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 4px;
+    -fx-font-size: 13px;
+    /* -fx-font-family: */  /* You can uncomment and add your font family here */
+}
+
+.button:hover {
+    -fx-background-color: #ffe099; /* Brighter orange for hover */
+}
+#cameraComboBox {
+    -fx-background-color: #ceffc7;  /* Light green */
+    -fx-text-fill: black;
+}
+#planeComboBox {
+    -fx-background-color: #add8e6;  /* Light blue */
+    -fx-text-fill: black;
+}
+#cameraComboBox:hover {
+    -fx-background-color: #c2f2b3;  /* Slightly darker green on hover */
+
+}
+
+#planeComboBox:hover {
+    -fx-background-color: #87ceeb;  /* Slightly darker blue on hover */
+}
+#drawPane{
+    -fx-background-color: white;
+}

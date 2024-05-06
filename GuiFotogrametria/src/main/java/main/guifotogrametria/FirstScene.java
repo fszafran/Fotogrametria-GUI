@@ -36,18 +36,21 @@ public class FirstScene implements Initializable {
     private TextField YLText;
     @FXML
     private TextField GSDText;
+    @FXML
+    private TextField pText;
+    @FXML
+    private TextField qText;
     final private double kmToMs = (double) 1000 / 3600;
     private double GSD;
     private double Dx;
     private double Dy;
-    private double p = 60;
-    private double q = 30;
+    private double p;
+    private double q;
     private double f;
     private double nX;
     private double nY;
     private double Bx;
     private double By;
-    private double wspolczynnikEmpiryczny;
     private double px;
     private double cyklPracy;
     private double maxPlaneLevel;
@@ -70,13 +73,7 @@ public class FirstScene implements Initializable {
     double[] getDParams(double Xp, double Yp, double Xl, double Yl){
         double Dx = Math.abs(Xp - Xl);
         double Dy = Math.abs(Yl - Yp); // może na odwrót
-        if(Dx>Dy){
-            this.northSouth = false;
-        }
-        else{
-            this.northSouth = true;
-        }
-
+        this.northSouth = !(Dx > Dy);
         return new double[]{Dx,Dy};
     }
 
@@ -96,7 +93,6 @@ public class FirstScene implements Initializable {
         double Ly = ly *GSD;
         System.out.println("p: "+p);
         System.out.println("q: "+q);
-
         System.out.println("Ly:"+Ly);
         double Bx = Lx * (100-p)/100;
         System.out.println("Bx: "+Bx);
@@ -116,7 +112,7 @@ public class FirstScene implements Initializable {
         double calculatedP = -((Dx*100)/((roofNx-4)*Lx)-100);
         System.out.println("Nowe Q: "+ calculatedQ);
         System.out.println("Nowe P: "+ calculatedP);
-        calculatedQ = Math.floor(calculatedQ * 10) / 10.0; // Truncate to one decimal place
+        calculatedQ = Math.floor(calculatedQ * 10) / 10.0;
         calculatedP = Math.floor(calculatedP * 10) / 10.0;
         this.q = calculatedQ;
         this.p = calculatedP;
@@ -192,6 +188,8 @@ public class FirstScene implements Initializable {
             if(this.absoluteHeight>this.maxPlaneLevel){
                 overLevelAlert();
             }
+            this.p = Double.parseDouble(pText.getText());
+            this.q = Double.parseDouble(qText.getText());
             double[] nParams = getNParams(this.GSD, ly, lx, this.p, this.q, this.Dx, this.Dy, planeMaxSpeed);
 //tu jest cos z lx ly - geodezja smierdzaca
             this.nX = nParams[0];
@@ -203,9 +201,6 @@ public class FirstScene implements Initializable {
             System.out.println(liczbaZdjec);
             System.out.println(this.Bx + ", "+ this.By);
             System.out.println(this.Dx + ", "+ this.Dy);
-
-            this.wspolczynnikEmpiryczny = this.liczbaZdjec * (this.Bx* this.By) / (this.Dx*this.Dy);
-            System.out.println("Wsp: "+this.wspolczynnikEmpiryczny);
             // v = s/t -> t = s/v
             if(!this.northSouth){
                 double totalDistance = this.Dx * this.nY;
@@ -219,7 +214,8 @@ public class FirstScene implements Initializable {
                 this.formattedTime = convertSeconds(totalTime);
 
             }
-            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.wspolczynnikEmpiryczny, this.formattedTime);
+            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q);
+
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root);

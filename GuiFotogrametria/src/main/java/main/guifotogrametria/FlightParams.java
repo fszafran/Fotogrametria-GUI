@@ -3,18 +3,19 @@ package main.guifotogrametria;
 public class FlightParams {
     private int liczbaZdjec;
     private int nY;
-    private String wspolczynnikEmpiryczny;
+    private int nX;
     private String czasLotu;
-    FlightParams (int liczbaZdjec, double nY, double wspolczynnikEmpiryczny, String czasLotu){
+    private double newP;
+    private double newQ;
+    FlightParams (int liczbaZdjec, double nY, double nX, String czasLotu, double newP, double newQ){
         this.czasLotu = czasLotu;
         this.liczbaZdjec = liczbaZdjec;
         this.nY = (int)nY;
-        this.wspolczynnikEmpiryczny = String.format("%.2f", wspolczynnikEmpiryczny);
+        this.nX = (int)nX;
         System.out.println("Lesgoo");
-    }
+        this.newP = newP;
+        this.newQ=newQ;
 
-    public String getWspolczynnikEmpiryczny() {
-        return wspolczynnikEmpiryczny;
     }
 
     public int getLiczbaZdjec() {
@@ -27,5 +28,16 @@ public class FlightParams {
 
     public String getCzasLotu() {
         return czasLotu;
+    }
+    public double getNewP(){
+        return newP;
+    }
+
+    public double getNewQ() {
+        return newQ;
+    }
+
+    public int getnX() {
+        return nX;
     }
 }
