@@ -7,7 +7,10 @@ public class FlightParams {
     private String czasLotu;
     private double newP;
     private double newQ;
-    FlightParams (int liczbaZdjec, double nY, double nX, String czasLotu, double newP, double newQ){
+    private boolean northSouth;
+    private double Dx;
+    private double Dy;
+    FlightParams (int liczbaZdjec, double nY, double nX, String czasLotu, double newP, double newQ, boolean northSouth,double Dx, double Dy){
         this.czasLotu = czasLotu;
         this.liczbaZdjec = liczbaZdjec;
         this.nY = (int)nY;
@@ -15,7 +18,9 @@ public class FlightParams {
         System.out.println("Lesgoo");
         this.newP = newP;
         this.newQ=newQ;
-
+        this.northSouth = northSouth;
+        this.Dx = Dx;
+        this.Dy = Dy;
     }
 
     public int getLiczbaZdjec() {
@@ -39,5 +44,16 @@ public class FlightParams {
 
     public int getnX() {
         return nX;
+    }
+    public boolean getnorthSouth(){
+        return northSouth;
+    }
+
+    public double getDx() {
+        return Dx;
+    }
+
+    public double getDy() {
+        return Dy;
     }
 }

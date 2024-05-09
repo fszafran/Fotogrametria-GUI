@@ -214,7 +214,7 @@ public class FirstScene implements Initializable {
                 this.formattedTime = convertSeconds(totalTime);
 
             }
-            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q);
+            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q, this.northSouth, this.Dx,this.Dy);
 
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
