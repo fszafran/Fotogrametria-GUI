@@ -164,10 +164,11 @@ public class FirstScene implements Initializable {
 //            double[] dParams = getDParams(Xp, Yp, Xl, Yl);
 //            this.Dx = dParams[0];
 //            this.Dy = dParams[1];
-            this.Dx = 19090;
-            this.Dy = 17219;
-            this.Bx = 1414;
-            this.By = 2722;
+            this.Dy = 19090;
+            this.Dx = 17219;
+            this.By = 1414;
+            this.Bx = 2722;
+            this.northSouth = true;
             double hMax = Double.parseDouble(hMaxText.getText());
             double hMin = Double.parseDouble(hMinText.getText());
             System.out.println("H"+hMin+" "+hMax);
@@ -215,7 +216,7 @@ public class FirstScene implements Initializable {
 
             }
             flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q, this.northSouth, this.Dx,this.Dy);
-
+            System.out.println("firstscene bool: "+ this.northSouth);
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root);

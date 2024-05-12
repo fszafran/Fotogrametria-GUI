@@ -66,8 +66,10 @@ public class SecondScene implements Initializable {
         imageView.setFitHeight(50);
         imageView.setFitWidth(50);
         imageView.setPreserveRatio(true);
+
+        System.out.println("draw bool: "+ this.southNorth);
         if(!southNorth){
-            //drawing pane 400x400
+            //drawing pane 400x400int
             int topRightX = 350;
             int topRightY = 20;
             int topLeftX = 50;
@@ -77,12 +79,12 @@ public class SecondScene implements Initializable {
             int photoDistance = (int) ((topRightX-topLeftX) / (this.nX-1));
             System.out.println("photo: "+photoDistance);
             imageView.setX(topRightX);
-            imageView.setY(topLeftY);
+            imageView.setY(-5);
+            imageView.setRotate(270);
             drawPane.getChildren().add(imageView);
             for(int i =0; i<this.nY;i++){
                 //draw lines
                 topRightX = 350;
-                topLeftX = 50;
                 Line line = new Line(topRightX,topRightY,topLeftX,topLeftY);
                 int controlY = topRightY + (int)rowDistance/2;
                 int controlX;
@@ -107,12 +109,60 @@ public class SecondScene implements Initializable {
                     drawPane.getChildren().add(line);
                 }
                 for(int j=0; j<this.nX;j++){
-                    Circle circle = new Circle(topRightX-5,topLeftY,2);
+                    Circle circle = new Circle(topRightX,topLeftY,2);
                     topRightX-=photoDistance;
                     drawPane.getChildren().add(circle);
                 }
                 topRightY+= (int) rowDistance;
                 topLeftY += (int) rowDistance;
+            }
+
+        }
+        else {
+            int rightX = 380;
+            int leftX = 20;
+            int leftBottomY = 350;
+            int leftBottomX = 20;
+            int leftTopY = 50;
+            int leftTopX = 20;
+            int colDistance = (int) ((rightX-leftX) / (this.nY-1));
+            int photoDistance = (int) ((leftBottomY-leftTopY) / (this.nX-1));
+            imageView.setX(-5);
+            imageView.setY(0);
+            imageView.setRotate(180);
+            drawPane.getChildren().add(imageView);
+            for(int i =0; i<this.nY;i++){
+                leftTopY = 50;
+                Line line = new Line(leftBottomX,leftBottomY,leftTopX,leftTopY);
+                int controlX = leftTopX + (int)colDistance/2;
+                int controlY;
+                int curveXStart = leftTopX;
+                int curveYStart;
+                if(i%2!=0){
+                    controlY = 10;
+                    curveYStart = 50;
+                }
+                else{
+                    controlY = 390;
+                    curveYStart = 350;
+                }
+                if(i!=this.nY-1){
+                    QuadCurve curve = new QuadCurve(curveXStart,curveYStart,controlX,controlY,curveXStart+colDistance,curveYStart);
+                    curve.setFill(Color.WHITE);
+                    curve.setStroke(Color.BLACK);
+                    curve.setStrokeWidth(1);
+                    drawPane.getChildren().addAll(line, curve);
+                }
+                else{
+                    drawPane.getChildren().add(line);
+                }
+                for(int j=0; j<this.nX;j++){
+                    Circle circle = new Circle(leftTopX,leftTopY,2);
+                    leftTopY+=photoDistance;
+                    drawPane.getChildren().add(circle);
+                }
+                leftTopX += (int) colDistance;
+                leftBottomX += (int) colDistance;
             }
 
         }
