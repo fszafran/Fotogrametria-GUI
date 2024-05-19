@@ -6,20 +6,20 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.guifotogrametria.SecondScene">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.guifotogrametria.SecondScene">
    <children>
-      <Label layoutX="410.0" layoutY="14.0" text="Parametry przelotu:">
+      <Label layoutX="607.0" layoutY="21.0" text="Parametry przelotu:">
          <font>
             <Font name="Calibri Bold" size="20.0" />
          </font>
       </Label>
-      <Label fx:id="szeregiLabel" layoutX="410.0" layoutY="60.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="zdjeciaLabel" layoutX="410.0" layoutY="120.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="liczbaWszereguLabel" layoutX="410.0" layoutY="90.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="czasLabel" layoutX="410.0" layoutY="150.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Button fx:id="backButton" layoutX="510.0" layoutY="352.0" mnemonicParsing="false" onAction="#back" text="Cofnij" />
-      <Label fx:id="pLabel" layoutX="410.0" layoutY="180.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="qLabel" layoutX="410.0" layoutY="210.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Pane fx:id="drawPane" layoutY="-1.0" prefHeight="400.0" prefWidth="400.0" />
+      <Label fx:id="szeregiLabel" layoutX="607.0" layoutY="67.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
+      <Label fx:id="zdjeciaLabel" layoutX="607.0" layoutY="127.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
+      <Label fx:id="liczbaWszereguLabel" layoutX="607.0" layoutY="97.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
+      <Label fx:id="czasLabel" layoutX="607.0" layoutY="157.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
+      <Button fx:id="backButton" layoutX="730.0" layoutY="557.0" mnemonicParsing="false" onAction="#back" text="Cofnij" />
+      <Label fx:id="pLabel" layoutX="607.0" layoutY="187.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
+      <Label fx:id="qLabel" layoutX="607.0" layoutY="217.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
+      <Pane fx:id="drawPane" layoutY="-1.0" prefHeight="600.0" prefWidth="600.0" />
    </children>
 </AnchorPane>

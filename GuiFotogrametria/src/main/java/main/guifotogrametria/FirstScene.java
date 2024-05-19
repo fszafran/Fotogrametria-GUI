@@ -40,7 +40,6 @@ public class FirstScene implements Initializable {
     private TextField pText;
     @FXML
     private TextField qText;
-    final private double kmToMs = (double) 1000 / 3600;
     private double GSD;
     private double Dx;
     private double Dy;
@@ -49,15 +48,15 @@ public class FirstScene implements Initializable {
     private double f;
     private double nX;
     private double nY;
-    private double Bx;
-    private double By;
     private double px;
-    private double cyklPracy;
-    private double maxPlaneLevel;
+    private double Lx;
+    private double Ly;
     private double absoluteHeight;
     final private Map<String, double[]> cameraMap = new HashMap<>();
     final private Map<String, double[]> planeMap = new HashMap<>();
-    private boolean northSouth;
+    private boolean northSouth=false;
+    private boolean pChanged=false;
+    private boolean qChanged=false;
     private int liczbaZdjec;
     private String formattedTime;
     public static FlightParams flightParams;
@@ -89,8 +88,10 @@ public class FirstScene implements Initializable {
     }
     double[] getNParams(double GSD, double lx, double ly, double p, double q, double Dx, double Dy, double v){
         double Lx = lx *GSD;
+        this.Lx=Lx;
         System.out.println("Lx:"+Lx);
         double Ly = ly *GSD;
+        this.Ly = Ly;
         System.out.println("p: "+p);
         System.out.println("q: "+q);
         System.out.println("Ly:"+Ly);
@@ -109,7 +110,15 @@ public class FirstScene implements Initializable {
         System.out.println("roofNx: "+ roofNx);
         System.out.println("roofNy: "+roofNy);
         double calculatedQ = -((Dy*100)/(roofNy*Ly)-100);
+        if(Math.abs(calculatedQ-q)>= 1e-3){
+            System.out.println("q: "+q + " qcal: "+calculatedQ);
+            this.qChanged = true;
+        }
         double calculatedP = -((Dx*100)/((roofNx-4)*Lx)-100);
+        if(Math.abs(calculatedP-p)>= 1e-3){
+            System.out.println("p: "+p + " pcal: "+calculatedP);
+            this.pChanged = true;
+        }
         System.out.println("Nowe Q: "+ calculatedQ);
         System.out.println("Nowe P: "+ calculatedP);
         calculatedQ = Math.floor(calculatedQ * 10) / 10.0;
@@ -157,36 +166,32 @@ public class FirstScene implements Initializable {
         try{
             this.GSD = Double.parseDouble(GSDText.getText())/100;
             System.out.println("GSD"+this.GSD);
-//            double Xp = Double.parseDouble(XPText.getText());
-//            double Yp = Double.parseDouble(YPText.getText());
-//            double Xl = Double.parseDouble(XLText.getText());
-//            double Yl = Double.parseDouble(YLText.getText());
-//            double[] dParams = getDParams(Xp, Yp, Xl, Yl);
-//            this.Dx = dParams[0];
-//            this.Dy = dParams[1];
-            this.Dy = 19090;
-            this.Dx = 17219;
-            this.By = 1414;
-            this.Bx = 2722;
+            double Xp = Double.parseDouble(XPText.getText());
+            double Yp = Double.parseDouble(YPText.getText());
+            double Xl = Double.parseDouble(XLText.getText());
+            double Yl = Double.parseDouble(YLText.getText());
+            double[] dParams = getDParams(Xp, Yp, Xl, Yl);
+            this.Dx = dParams[0];
+            this.Dy = dParams[1];
             this.northSouth = true;
             double hMax = Double.parseDouble(hMaxText.getText());
             double hMin = Double.parseDouble(hMinText.getText());
             System.out.println("H"+hMin+" "+hMax);
             double[] chosenCamera = cameraMap.get(cameraComboBox.getValue());
             double[] chosenPlane = planeMap.get(planeComboBox.getValue());
-            this.maxPlaneLevel = chosenPlane[2];
+            double maxPlaneLevel = chosenPlane[2];
             this.f = chosenCamera[3];
-            this.cyklPracy = chosenCamera[4];
+            double cyklPracy = chosenCamera[4];
             this.px = chosenCamera[2];
             double planeMaxSpeed = chosenPlane[1];
             double planeMinSpeed = chosenPlane[0];
             double averagePlaneSpeed = (planeMaxSpeed + planeMinSpeed)/2;
             double lx = chosenCamera[0];
             double ly = chosenCamera[1];
-            System.out.println("pułap"+this.maxPlaneLevel);
+            System.out.println("pułap"+ maxPlaneLevel);
             this.absoluteHeight = getAbsoluteHeight(this.GSD, this.f, this.px, hMax, hMin);
             System.out.println("Habs: "+this.absoluteHeight);
-            if(this.absoluteHeight>this.maxPlaneLevel){
+            if(this.absoluteHeight> maxPlaneLevel){
                 overLevelAlert();
             }
             this.p = Double.parseDouble(pText.getText());
@@ -195,12 +200,11 @@ public class FirstScene implements Initializable {
 //tu jest cos z lx ly - geodezja smierdzaca
             this.nX = nParams[0];
             this.nY = nParams[1];
-            if(this.cyklPracy>nParams[2]){
+            if(cyklPracy >nParams[2]){
                 showAlert("Przekroczono cykl pracy", "Delta t jest mniejsza od cyklu pracy");
             }
             this.liczbaZdjec = (int)(this.nX * this.nY);
             System.out.println(liczbaZdjec);
-            System.out.println(this.Bx + ", "+ this.By);
             System.out.println(this.Dx + ", "+ this.Dy);
             // v = s/t -> t = s/v
             if(!this.northSouth){
@@ -210,12 +214,12 @@ public class FirstScene implements Initializable {
                 System.out.println("Czas"+ formattedTime);
             }
             else{
-                double totalDistance = this.Dy *this.nX;
+                double totalDistance = this.Dy * this.nY;
                 double totalTime = totalDistance/averagePlaneSpeed + (this.nY-1)*((double) 140 /60);
                 this.formattedTime = convertSeconds(totalTime);
 
             }
-            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q, this.northSouth, this.Dx,this.Dy);
+            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q, this.northSouth, this.Dx,this.Dy, this.Lx,this.Ly,this.pChanged,this.qChanged);
             System.out.println("firstscene bool: "+ this.northSouth);
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
@@ -237,6 +241,7 @@ public class FirstScene implements Initializable {
         cameraMap.put("Leica DMC III", new double[]{25728,14592,3.9e-6, 92e-3, 1.9});
         cameraMap.put("UltraCam Falcon", new double[]{17310,11310,6.0e-6, 70e-3, 1.35});
         cameraMap.put("UltraCam Hawk", new double[]{23010,14790,4.6e-6, 80e-3, 1.65});
+        double kmToMs = (double) 1000 / 3600;
         planeMap.put("Cessna 402", new double[]{132* kmToMs, 428* kmToMs, 8200, 5});
         planeMap.put("T206H NAV III", new double[]{100* kmToMs,280* kmToMs,4785,5});
         planeMap.put("Vulcan Air P68 Observer 2", new double[]{135* kmToMs,275* kmToMs,6100,6});
@@ -245,5 +250,8 @@ public class FirstScene implements Initializable {
         String[] cameras = cameraMap.keySet().toArray(new String[0]);
         cameraComboBox.getItems().addAll(cameras);
         planeComboBox.getItems().addAll(planes);
+        if (flightParams != null){
+
+        }
     }
 }

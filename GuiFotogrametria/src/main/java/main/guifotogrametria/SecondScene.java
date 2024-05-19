@@ -6,10 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -17,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.QuadCurve;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -49,9 +47,14 @@ public class SecondScene implements Initializable {
     private String czasLotu = FirstScene.flightParams.getCzasLotu();
     private double newP = FirstScene.flightParams.getNewP();
     private double newQ=FirstScene.flightParams.getNewQ();
-    private boolean southNorth = FirstScene.flightParams.getnorthSouth();
+    private boolean northSouth = FirstScene.flightParams.getnorthSouth();
     private double Dx = FirstScene.flightParams.getDx();
     private double Dy = FirstScene.flightParams.getDy();
+    private double Lx = FirstScene.flightParams.getLx();
+    private double Ly = FirstScene.flightParams.getLy();
+    private boolean qChanged = FirstScene.flightParams.isqChanged();
+    private boolean pChanged = FirstScene.flightParams.ispChanged();
+
 
     public void back(ActionEvent event) throws IOException {
         root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("FirstScene.fxml")));
@@ -60,32 +63,47 @@ public class SecondScene implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
+    int[] rectangleCoords(double Dx, double Dy, double Lx, double Ly, boolean southNorth){
+        int xDistance;
+        int yDistance;
+        if(!southNorth){
+            xDistance = (int)((500 * Lx)/Dx);
+            System.out.println("x: "+ xDistance);
+            yDistance = (int)((560 * Ly)/Dy);
+            System.out.println("y: "+ yDistance);
+        }
+        else{
+            xDistance = (int) (500 * Ly);
+            yDistance = (int) (560 * Lx);
+        }
+        return new int []{xDistance,yDistance};
+    }
     private void draw(){
         Image image = new Image("/jet.jpg");
         ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(50);
-        imageView.setFitWidth(50);
+        imageView.setFitHeight(25);
+        imageView.setFitWidth(25);
         imageView.setPreserveRatio(true);
-
-        System.out.println("draw bool: "+ this.southNorth);
-        if(!southNorth){
-            //drawing pane 400x400int
-            int topRightX = 350;
-            int topRightY = 20;
+        System.out.println("draw bool: "+ this.northSouth);
+        System.out.println("Lx: "+ Lx + " Ly: "+Ly);
+        if(!northSouth){
+            int topRightX = 550;
+            int topRightY = 100;
             int topLeftX = 50;
-            int topLeftY = 20;
-            int bottomY = 380;
+            int topLeftY = 100;
+            int bottomY = 500;
             int rowDistance = (int) ((bottomY-topLeftY) / (this.nY-1));
             int photoDistance = (int) ((topRightX-topLeftX) / (this.nX-1));
             System.out.println("photo: "+photoDistance);
-            imageView.setX(topRightX);
-            imageView.setY(-5);
+            imageView.setX(topRightX+(int)(photoDistance/2)+2);
+            imageView.setY(topLeftY-12.5);
             imageView.setRotate(270);
             drawPane.getChildren().add(imageView);
             for(int i =0; i<this.nY;i++){
                 //draw lines
-                topRightX = 350;
+                topRightX = 550;
                 Line line = new Line(topRightX,topRightY,topLeftX,topLeftY);
+                line.setStrokeWidth(2);
                 int controlY = topRightY + (int)rowDistance/2;
                 int controlX;
                 int curveXStart;
@@ -95,22 +113,28 @@ public class SecondScene implements Initializable {
                     curveXStart = 50;
                 }
                 else{
-                    controlX = 390;
-                    curveXStart = 350;
+                    controlX = 590;
+                    curveXStart = 550;
                 }
                 if(i!= this.nY-1){
                     QuadCurve curve = new QuadCurve(curveXStart, curveYStart, controlX, controlY, curveXStart, curveYStart + rowDistance);
-                    curve.setFill(Color.WHITE);
+                    curve.setFill(Color.TRANSPARENT);
                     curve.setStroke(Color.BLACK);
-                    curve.setStrokeWidth(1);
-                    drawPane.getChildren().addAll(line, curve);
+                    curve.setStrokeWidth(2);
+                    drawPane.getChildren().addAll(line,curve);
+
                 }
                 else{
                     drawPane.getChildren().add(line);
                 }
                 for(int j=0; j<this.nX;j++){
-                    Circle circle = new Circle(topRightX,topLeftY,2);
+                    Circle circle = new Circle(topRightX,topLeftY,3);
+                    Rectangle rectangle = new Rectangle(topRightX-(int)(photoDistance/2),topLeftY-(int)(rowDistance/2),photoDistance,rowDistance);
+                    rectangle.setFill(Color.TRANSPARENT);
+                    rectangle.setStroke(Color.LIGHTBLUE);
+                    rectangle.setStrokeWidth(1);
                     topRightX-=photoDistance;
+                    drawPane.getChildren().addFirst(rectangle);
                     drawPane.getChildren().add(circle);
                 }
                 topRightY+= (int) rowDistance;
@@ -119,16 +143,16 @@ public class SecondScene implements Initializable {
 
         }
         else {
-            int rightX = 380;
-            int leftX = 20;
-            int leftBottomY = 350;
-            int leftBottomX = 20;
+            int rightX = 500;
+            int leftX = 100;
+            int leftBottomY = 550;
+            int leftBottomX = 100;
             int leftTopY = 50;
-            int leftTopX = 20;
+            int leftTopX = 100;
             int colDistance = (int) ((rightX-leftX) / (this.nY-1));
             int photoDistance = (int) ((leftBottomY-leftTopY) / (this.nX-1));
-            imageView.setX(-5);
-            imageView.setY(0);
+            imageView.setX(leftTopX-12.5);
+            imageView.setY(leftTopY-(photoDistance)-12.5);
             imageView.setRotate(180);
             drawPane.getChildren().add(imageView);
             for(int i =0; i<this.nY;i++){
@@ -143,12 +167,12 @@ public class SecondScene implements Initializable {
                     curveYStart = 50;
                 }
                 else{
-                    controlY = 390;
-                    curveYStart = 350;
+                    controlY = 590;
+                    curveYStart = 550;
                 }
                 if(i!=this.nY-1){
                     QuadCurve curve = new QuadCurve(curveXStart,curveYStart,controlX,controlY,curveXStart+colDistance,curveYStart);
-                    curve.setFill(Color.WHITE);
+                    curve.setFill(Color.TRANSPARENT);
                     curve.setStroke(Color.BLACK);
                     curve.setStrokeWidth(1);
                     drawPane.getChildren().addAll(line, curve);
@@ -158,7 +182,12 @@ public class SecondScene implements Initializable {
                 }
                 for(int j=0; j<this.nX;j++){
                     Circle circle = new Circle(leftTopX,leftTopY,2);
+                    Rectangle rectangle = new Rectangle(leftTopX-(int)(colDistance/2),leftTopY-(int)(photoDistance/2),colDistance,photoDistance);
+                    rectangle.setFill(Color.TRANSPARENT);
+                    rectangle.setStroke(Color.LIGHTBLUE);
+                    rectangle.setStrokeWidth(1);
                     leftTopY+=photoDistance;
+                    drawPane.getChildren().addFirst(rectangle);
                     drawPane.getChildren().add(circle);
                 }
                 leftTopX += (int) colDistance;
@@ -176,10 +205,10 @@ public class SecondScene implements Initializable {
         System.out.println(newP);
         System.out.println(newQ);
         draw();
-        if(newP != 60){
+        if(pChanged){
             pLabel.setText("Zmieniono wartosc p, na : " + newP+"%");
         }
-        if(newQ != 30){
+        if(qChanged){
             qLabel.setText("Zmieniono wartosc q, na: " + newQ+"%");
         }
     }
