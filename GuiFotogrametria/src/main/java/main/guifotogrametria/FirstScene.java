@@ -71,62 +71,39 @@ public class FirstScene implements Initializable {
     }
     double[] getDParams(double Xp, double Yp, double Xl, double Yl){
         double Dx = Math.abs(Xp - Xl);
-        double Dy = Math.abs(Yl - Yp); // może na odwrót
+        double Dy = Math.abs(Yl - Yp);
         this.northSouth = !(Dx > Dy);
         return new double[]{Dx,Dy};
     }
 
     double getAbsoluteHeight(double GSD, double f, double px, double hMax, double hMin){
         double height = (GSD *f)/px;
-        System.out.println("GSD w funkcji: "+GSD);
-        System.out.println("f w funkcji: "+f);
-        System.out.println("px w funkcji: "+px);
-        System.out.println("W"+height);
         double averageHeight = (hMax+hMin)/2;
-        System.out.println("Wavg"+height);
         return height+averageHeight;
     }
     double[] getNParams(double GSD, double lx, double ly, double p, double q, double Dx, double Dy, double v){
         double Lx = lx *GSD;
         this.Lx=Lx;
-        System.out.println("Lx:"+Lx);
         double Ly = ly *GSD;
         this.Ly = Ly;
-        System.out.println("p: "+p);
-        System.out.println("q: "+q);
-        System.out.println("Ly:"+Ly);
         double Bx = Lx * (100-p)/100;
-        System.out.println("Bx: "+Bx);
         double By = Ly * (100-q)/100;
-        System.out.println("By: "+By);
         double Ny = Dy /By;
         double Nx = Dx /Bx + 4;
         double roofNy = Math.ceil(Ny);
         double roofNx = Math.ceil(Nx);
-        System.out.println("Dx: "+ Dx);
-        System.out.println("Dy: "+Dy);
-        System.out.println("Nx: "+ Nx);
-        System.out.println("Ny: "+Ny);
-        System.out.println("roofNx: "+ roofNx);
-        System.out.println("roofNy: "+roofNy);
         double calculatedQ = -((Dy*100)/(roofNy*Ly)-100);
         if(Math.abs(calculatedQ-q)>= 1e-3){
-            System.out.println("q: "+q + " qcal: "+calculatedQ);
             this.qChanged = true;
         }
         double calculatedP = -((Dx*100)/((roofNx-4)*Lx)-100);
         if(Math.abs(calculatedP-p)>= 1e-3){
-            System.out.println("p: "+p + " pcal: "+calculatedP);
             this.pChanged = true;
         }
-        System.out.println("Nowe Q: "+ calculatedQ);
-        System.out.println("Nowe P: "+ calculatedP);
         calculatedQ = Math.floor(calculatedQ * 10) / 10.0;
         calculatedP = Math.floor(calculatedP * 10) / 10.0;
         this.q = calculatedQ;
         this.p = calculatedP;
-        System.out.println("Nowe Q: "+ this.q);
-        System.out.println("Nowe P: "+ this.p);
         double deltaTime = Bx/v;
         return new double[]{roofNx,roofNy,deltaTime,Bx,By};
     }
@@ -165,7 +142,6 @@ public class FirstScene implements Initializable {
     public void submit(ActionEvent event) throws IOException {
         try{
             this.GSD = Double.parseDouble(GSDText.getText())/100;
-            System.out.println("GSD"+this.GSD);
             double Xp = Double.parseDouble(XPText.getText());
             double Yp = Double.parseDouble(YPText.getText());
             double Xl = Double.parseDouble(XLText.getText());
@@ -173,10 +149,8 @@ public class FirstScene implements Initializable {
             double[] dParams = getDParams(Xp, Yp, Xl, Yl);
             this.Dx = dParams[0];
             this.Dy = dParams[1];
-            this.northSouth = true;
             double hMax = Double.parseDouble(hMaxText.getText());
             double hMin = Double.parseDouble(hMinText.getText());
-            System.out.println("H"+hMin+" "+hMax);
             double[] chosenCamera = cameraMap.get(cameraComboBox.getValue());
             double[] chosenPlane = planeMap.get(planeComboBox.getValue());
             double maxPlaneLevel = chosenPlane[2];
@@ -188,39 +162,30 @@ public class FirstScene implements Initializable {
             double averagePlaneSpeed = (planeMaxSpeed + planeMinSpeed)/2;
             double lx = chosenCamera[0];
             double ly = chosenCamera[1];
-            System.out.println("pułap"+ maxPlaneLevel);
             this.absoluteHeight = getAbsoluteHeight(this.GSD, this.f, this.px, hMax, hMin);
-            System.out.println("Habs: "+this.absoluteHeight);
             if(this.absoluteHeight> maxPlaneLevel){
                 overLevelAlert();
             }
             this.p = Double.parseDouble(pText.getText());
             this.q = Double.parseDouble(qText.getText());
             double[] nParams = getNParams(this.GSD, ly, lx, this.p, this.q, this.Dx, this.Dy, planeMaxSpeed);
-//tu jest cos z lx ly - geodezja smierdzaca
             this.nX = nParams[0];
             this.nY = nParams[1];
             if(cyklPracy >nParams[2]){
                 showAlert("Przekroczono cykl pracy", "Delta t jest mniejsza od cyklu pracy");
             }
             this.liczbaZdjec = (int)(this.nX * this.nY);
-            System.out.println(liczbaZdjec);
-            System.out.println(this.Dx + ", "+ this.Dy);
-            // v = s/t -> t = s/v
             if(!this.northSouth){
                 double totalDistance = this.Dx * this.nY;
                 double totalTime = totalDistance/averagePlaneSpeed + (this.nY-1)*((double) 140 /60);
                 this.formattedTime = convertSeconds(totalTime);
-                System.out.println("Czas"+ formattedTime);
             }
             else{
                 double totalDistance = this.Dy * this.nY;
                 double totalTime = totalDistance/averagePlaneSpeed + (this.nY-1)*((double) 140 /60);
                 this.formattedTime = convertSeconds(totalTime);
-
             }
             flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q, this.northSouth, this.Dx,this.Dy, this.Lx,this.Ly,this.pChanged,this.qChanged);
-            System.out.println("firstscene bool: "+ this.northSouth);
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root);
@@ -233,7 +198,6 @@ public class FirstScene implements Initializable {
         catch (NumberFormatException e) {
             showAlert("Niepoprawny format wejściowy", "Wprowadź poprawne wartości liczbowe");
         }
-
     }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -250,8 +214,5 @@ public class FirstScene implements Initializable {
         String[] cameras = cameraMap.keySet().toArray(new String[0]);
         cameraComboBox.getItems().addAll(cameras);
         planeComboBox.getItems().addAll(planes);
-        if (flightParams != null){
-
-        }
     }
 }

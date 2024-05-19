@@ -13,13 +13,13 @@
             <Font name="Calibri Bold" size="20.0" />
          </font>
       </Label>
-      <Label fx:id="szeregiLabel" layoutX="607.0" layoutY="67.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="zdjeciaLabel" layoutX="607.0" layoutY="127.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="liczbaWszereguLabel" layoutX="607.0" layoutY="97.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="czasLabel" layoutX="607.0" layoutY="157.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Button fx:id="backButton" layoutX="730.0" layoutY="557.0" mnemonicParsing="false" onAction="#back" text="Cofnij" />
-      <Label fx:id="pLabel" layoutX="607.0" layoutY="187.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
-      <Label fx:id="qLabel" layoutX="607.0" layoutY="217.0" prefHeight="18.0" prefWidth="178.0" text="aaa" />
+      <Label fx:id="szeregiLabel" layoutX="607.0" layoutY="67.0" prefHeight="18.0" prefWidth="178.0"/>
+      <Label fx:id="zdjeciaLabel" layoutX="607.0" layoutY="127.0" prefHeight="18.0" prefWidth="178.0" />
+      <Label fx:id="liczbaWszereguLabel" layoutX="607.0" layoutY="97.0" prefHeight="18.0" prefWidth="178.0" />
+      <Label fx:id="czasLabel" layoutX="607.0" layoutY="157.0" prefHeight="18.0" prefWidth="178.0" />
+      <Button fx:id="backButton" layoutX="730.0" layoutY="557.0" mnemonicParsing="false" onAction="#back" text="Cofnij"/>
+      <Label fx:id="pLabel" layoutX="607.0" layoutY="187.0" prefHeight="18.0" prefWidth="178.0" />
+      <Label fx:id="qLabel" layoutX="607.0" layoutY="217.0" prefHeight="18.0" prefWidth="178.0" />
       <Pane fx:id="drawPane" layoutY="-1.0" prefHeight="600.0" prefWidth="600.0" />
    </children>
 </AnchorPane>

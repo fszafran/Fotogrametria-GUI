@@ -63,38 +63,20 @@ public class SecondScene implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
-    int[] rectangleCoords(double Dx, double Dy, double Lx, double Ly, boolean southNorth){
-        int xDistance;
-        int yDistance;
-        if(!southNorth){
-            xDistance = (int)((500 * Lx)/Dx);
-            System.out.println("x: "+ xDistance);
-            yDistance = (int)((560 * Ly)/Dy);
-            System.out.println("y: "+ yDistance);
-        }
-        else{
-            xDistance = (int) (500 * Ly);
-            yDistance = (int) (560 * Lx);
-        }
-        return new int []{xDistance,yDistance};
-    }
     private void draw(){
         Image image = new Image("/jet.jpg");
         ImageView imageView = new ImageView(image);
         imageView.setFitHeight(25);
         imageView.setFitWidth(25);
         imageView.setPreserveRatio(true);
-        System.out.println("draw bool: "+ this.northSouth);
-        System.out.println("Lx: "+ Lx + " Ly: "+Ly);
         if(!northSouth){
             int topRightX = 550;
-            int topRightY = 100;
+            int topRightY = 175;
             int topLeftX = 50;
-            int topLeftY = 100;
-            int bottomY = 500;
+            int topLeftY = 175;
+            int bottomY = 425;
             int rowDistance = (int) ((bottomY-topLeftY) / (this.nY-1));
             int photoDistance = (int) ((topRightX-topLeftX) / (this.nX-1));
-            System.out.println("photo: "+photoDistance);
             imageView.setX(topRightX+(int)(photoDistance/2)+2);
             imageView.setY(topLeftY-12.5);
             imageView.setRotate(270);
@@ -144,11 +126,11 @@ public class SecondScene implements Initializable {
         }
         else {
             int rightX = 500;
-            int leftX = 100;
+            int leftX = 175;
             int leftBottomY = 550;
-            int leftBottomX = 100;
+            int leftBottomX = 175;
             int leftTopY = 50;
-            int leftTopX = 100;
+            int leftTopX = 175;
             int colDistance = (int) ((rightX-leftX) / (this.nY-1));
             int photoDistance = (int) ((leftBottomY-leftTopY) / (this.nX-1));
             imageView.setX(leftTopX-12.5);
@@ -158,6 +140,7 @@ public class SecondScene implements Initializable {
             for(int i =0; i<this.nY;i++){
                 leftTopY = 50;
                 Line line = new Line(leftBottomX,leftBottomY,leftTopX,leftTopY);
+                line.setStrokeWidth(2);
                 int controlX = leftTopX + (int)colDistance/2;
                 int controlY;
                 int curveXStart = leftTopX;
@@ -174,14 +157,14 @@ public class SecondScene implements Initializable {
                     QuadCurve curve = new QuadCurve(curveXStart,curveYStart,controlX,controlY,curveXStart+colDistance,curveYStart);
                     curve.setFill(Color.TRANSPARENT);
                     curve.setStroke(Color.BLACK);
-                    curve.setStrokeWidth(1);
+                    curve.setStrokeWidth(2);
                     drawPane.getChildren().addAll(line, curve);
                 }
                 else{
                     drawPane.getChildren().add(line);
                 }
                 for(int j=0; j<this.nX;j++){
-                    Circle circle = new Circle(leftTopX,leftTopY,2);
+                    Circle circle = new Circle(leftTopX,leftTopY,3);
                     Rectangle rectangle = new Rectangle(leftTopX-(int)(colDistance/2),leftTopY-(int)(photoDistance/2),colDistance,photoDistance);
                     rectangle.setFill(Color.TRANSPARENT);
                     rectangle.setStroke(Color.LIGHTBLUE);
@@ -202,8 +185,6 @@ public class SecondScene implements Initializable {
         liczbaWszereguLabel.setText("Liczba zdjęć w szeregu: "+ (int) nX);
         zdjeciaLabel.setText("Liczba zdjęć w sumie: "+ liczbaZdjec);
         czasLabel.setText("Czas przelotu: "+ czasLotu);
-        System.out.println(newP);
-        System.out.println(newQ);
         draw();
         if(pChanged){
             pLabel.setText("Zmieniono wartosc p, na : " + newP+"%");
