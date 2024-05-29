@@ -1,4 +1,5 @@
 package main.guifotogrametria;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -38,28 +39,21 @@ public class SecondScene implements Initializable {
     @FXML
     private Pane drawPane;
 
-    private Stage stage;
-    private Scene scene;
-    private Parent root;
-    private int liczbaZdjec = FirstScene.flightParams.getLiczbaZdjec();
-    private double nY = FirstScene.flightParams.getnY();
-    private double nX = FirstScene.flightParams.getnX();
-    private String czasLotu = FirstScene.flightParams.getCzasLotu();
-    private double newP = FirstScene.flightParams.getNewP();
-    private double newQ=FirstScene.flightParams.getNewQ();
-    private boolean northSouth = FirstScene.flightParams.getnorthSouth();
-    private double Dx = FirstScene.flightParams.getDx();
-    private double Dy = FirstScene.flightParams.getDy();
-    private double Lx = FirstScene.flightParams.getLx();
-    private double Ly = FirstScene.flightParams.getLy();
-    private boolean qChanged = FirstScene.flightParams.isqChanged();
-    private boolean pChanged = FirstScene.flightParams.ispChanged();
+    private final int liczbaZdjec = FirstScene.flightParams.getLiczbaZdjec();
+    private final double nY = FirstScene.flightParams.getnY();
+    private final double nX = FirstScene.flightParams.getnX();
+    private final String czasLotu = FirstScene.flightParams.getCzasLotu();
+    private final double newP = FirstScene.flightParams.getNewP();
+    private final double newQ=FirstScene.flightParams.getNewQ();
+    private final boolean northSouth = FirstScene.flightParams.getnorthSouth();
+    private final boolean qChanged = FirstScene.flightParams.isqChanged();
+    private final boolean pChanged = FirstScene.flightParams.ispChanged();
 
 
     public void back(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("FirstScene.fxml")));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene=new Scene(root);
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("FirstScene.fxml")));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
     }
@@ -71,13 +65,13 @@ public class SecondScene implements Initializable {
         imageView.setPreserveRatio(true);
         if(!northSouth){
             int topRightX = 550;
-            int topRightY = 175;
+            int topRightY = 150;
             int topLeftX = 50;
-            int topLeftY = 175;
-            int bottomY = 425;
+            int topLeftY = 150;
+            int bottomY = 450;
             int rowDistance = (int) ((bottomY-topLeftY) / (this.nY-1));
             int photoDistance = (int) ((topRightX-topLeftX) / (this.nX-1));
-            imageView.setX(topRightX+(int)(photoDistance/2)+2);
+            imageView.setX(topRightX+ (double) photoDistance /2 +2);
             imageView.setY(topLeftY-12.5);
             imageView.setRotate(270);
             drawPane.getChildren().add(imageView);
@@ -86,7 +80,7 @@ public class SecondScene implements Initializable {
                 topRightX = 550;
                 Line line = new Line(topRightX,topRightY,topLeftX,topLeftY);
                 line.setStrokeWidth(2);
-                int controlY = topRightY + (int)rowDistance/2;
+                int controlY = topRightY + rowDistance/2;
                 int controlX;
                 int curveXStart;
                 int curveYStart=topLeftY;
@@ -110,27 +104,21 @@ public class SecondScene implements Initializable {
                     drawPane.getChildren().add(line);
                 }
                 for(int j=0; j<this.nX;j++){
-                    Circle circle = new Circle(topRightX,topLeftY,3);
-                    Rectangle rectangle = new Rectangle(topRightX-(int)(photoDistance/2),topLeftY-(int)(rowDistance/2),photoDistance,rowDistance);
-                    rectangle.setFill(Color.TRANSPARENT);
-                    rectangle.setStroke(Color.LIGHTBLUE);
-                    rectangle.setStrokeWidth(1);
-                    topRightX-=photoDistance;
-                    drawPane.getChildren().addFirst(rectangle);
-                    drawPane.getChildren().add(circle);
+                    circles(topLeftY, topRightX, photoDistance, rowDistance, j);
+                    topRightX -= photoDistance;
                 }
-                topRightY+= (int) rowDistance;
-                topLeftY += (int) rowDistance;
+                topRightY+= rowDistance;
+                topLeftY += rowDistance;
             }
 
         }
         else {
             int rightX = 500;
-            int leftX = 175;
+            int leftX = 100;
             int leftBottomY = 550;
-            int leftBottomX = 175;
+            int leftBottomX = 100;
             int leftTopY = 50;
-            int leftTopX = 175;
+            int leftTopX = 100;
             int colDistance = (int) ((rightX-leftX) / (this.nY-1));
             int photoDistance = (int) ((leftBottomY-leftTopY) / (this.nX-1));
             imageView.setX(leftTopX-12.5);
@@ -141,7 +129,7 @@ public class SecondScene implements Initializable {
                 leftTopY = 50;
                 Line line = new Line(leftBottomX,leftBottomY,leftTopX,leftTopY);
                 line.setStrokeWidth(2);
-                int controlX = leftTopX + (int)colDistance/2;
+                int controlX = leftTopX + colDistance /2;
                 int controlY;
                 int curveXStart = leftTopX;
                 int curveYStart;
@@ -164,21 +152,28 @@ public class SecondScene implements Initializable {
                     drawPane.getChildren().add(line);
                 }
                 for(int j=0; j<this.nX;j++){
-                    Circle circle = new Circle(leftTopX,leftTopY,3);
-                    Rectangle rectangle = new Rectangle(leftTopX-(int)(colDistance/2),leftTopY-(int)(photoDistance/2),colDistance,photoDistance);
-                    rectangle.setFill(Color.TRANSPARENT);
-                    rectangle.setStroke(Color.LIGHTBLUE);
-                    rectangle.setStrokeWidth(1);
+                    circles(leftTopY, leftTopX, colDistance, photoDistance, j);
                     leftTopY+=photoDistance;
-                    drawPane.getChildren().addFirst(rectangle);
-                    drawPane.getChildren().add(circle);
                 }
-                leftTopX += (int) colDistance;
-                leftBottomX += (int) colDistance;
+                leftTopX += colDistance;
+                leftBottomX += colDistance;
             }
 
         }
     }
+
+    private void circles(int leftTopY, int leftTopX, int colDistance, int photoDistance, int j) {
+        Circle circle = new Circle(leftTopX,leftTopY,3);
+        if(j>1 && j <this.nX - 2) {
+            Rectangle rectangle = new Rectangle(leftTopX - ((double) colDistance / 2), leftTopY - ((double) photoDistance / 2), colDistance, photoDistance);
+            rectangle.setFill(Color.TRANSPARENT);
+            rectangle.setStroke(Color.LIGHTBLUE);
+            rectangle.setStrokeWidth(2);
+            drawPane.getChildren().addFirst(rectangle);
+        }
+        drawPane.getChildren().add(circle);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         szeregiLabel.setText("Liczba szeregów: "+ (int)nY);

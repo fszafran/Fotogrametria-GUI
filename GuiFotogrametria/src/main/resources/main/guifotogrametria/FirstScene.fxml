@@ -13,11 +13,11 @@
       <Label layoutX="109.0" layoutY="182.0" text="Współrzędne prawego-górnego rogu [m]:" />
       <TextField fx:id="XPText" layoutX="111.0" layoutY="200.0" prefHeight="26.0" prefWidth="120.0" promptText="X:" />
       <TextField fx:id="YPText" layoutX="246.0" layoutY="200.0" prefHeight="26.0" prefWidth="120.0" promptText="Y:" />
-      <TextField fx:id="XLText" layoutX="111.0" layoutY="143.0" prefHeight="26.0" prefWidth="120.0" promptText="X:" />
-      <TextField fx:id="YLText" layoutX="246.0" layoutY="143.0" prefHeight="26.0" prefWidth="120.0" promptText="Y:" />
+      <TextField fx:id="XLText" layoutX="111.0" layoutY="143.0" prefHeight="26.0" prefWidth="120.0" promptText="X:"/>
+      <TextField fx:id="YLText" layoutX="246.0" layoutY="143.0" prefHeight="26.0" prefWidth="120.0" promptText="Y:"/>
       <Label layoutX="109.0" layoutY="242.0" text="Wprowadź wysokość min i max terenu:" />
-      <TextField fx:id="hMinText" layoutX="111.0" layoutY="273.0" prefHeight="25.0" prefWidth="88.0" promptText="H MIN [m]" />
-      <TextField fx:id="hMaxText" layoutX="246.0" layoutY="273.0" prefHeight="25.0" prefWidth="88.0" promptText="H MAX [m]" />
+      <TextField fx:id="hMinText" layoutX="111.0" layoutY="273.0" prefHeight="25.0" prefWidth="88.0" promptText="H MIN [m]"/>
+      <TextField fx:id="hMaxText" layoutX="246.0" layoutY="273.0" prefHeight="25.0" prefWidth="88.0" promptText="H MAX [m]"/>
       <ComboBox fx:id="planeComboBox" layoutX="457.0" layoutY="213.0" prefHeight="26.0" prefWidth="180.0" promptText="Wybierz samolot" />
       <ComboBox fx:id="cameraComboBox" layoutX="457.0" layoutY="260.0" prefHeight="26.0" prefWidth="180.0" promptText="Wybierz kamerę" />
       <Button fx:id="submitButton" layoutX="584.0" layoutY="438.0" mnemonicParsing="false" onAction="#submit" prefHeight="25.0" prefWidth="103.0" text="OK" />

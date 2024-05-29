@@ -40,29 +40,15 @@ public class FirstScene implements Initializable {
     private TextField pText;
     @FXML
     private TextField qText;
-    private double GSD;
-    private double Dx;
-    private double Dy;
     private double p;
     private double q;
-    private double f;
-    private double nX;
-    private double nY;
-    private double px;
-    private double Lx;
-    private double Ly;
     private double absoluteHeight;
     final private Map<String, double[]> cameraMap = new HashMap<>();
     final private Map<String, double[]> planeMap = new HashMap<>();
     private boolean northSouth=false;
     private boolean pChanged=false;
     private boolean qChanged=false;
-    private int liczbaZdjec;
-    private String formattedTime;
     public static FlightParams flightParams;
-    private Stage stage;
-    private Scene scene;
-    private Parent root;
 
     String convertSeconds(double totalSecs){
         int hours = (int) (totalSecs / 3600);
@@ -83,9 +69,7 @@ public class FirstScene implements Initializable {
     }
     double[] getNParams(double GSD, double lx, double ly, double p, double q, double Dx, double Dy, double v){
         double Lx = lx *GSD;
-        this.Lx=Lx;
         double Ly = ly *GSD;
-        this.Ly = Ly;
         double Bx = Lx * (100-p)/100;
         double By = Ly * (100-q)/100;
         double Ny = Dy /By;
@@ -136,59 +120,60 @@ public class FirstScene implements Initializable {
             }
             i++;
         }
-        alert.setContentText("Proponowane modele: " + result.toString());
+        alert.setContentText("Proponowane modele: " + result);
         alert.showAndWait();
     }
     public void submit(ActionEvent event) throws IOException {
         try{
-            this.GSD = Double.parseDouble(GSDText.getText())/100;
+            double GSD = Double.parseDouble(GSDText.getText()) / 100;
             double Xp = Double.parseDouble(XPText.getText());
             double Yp = Double.parseDouble(YPText.getText());
             double Xl = Double.parseDouble(XLText.getText());
             double Yl = Double.parseDouble(YLText.getText());
             double[] dParams = getDParams(Xp, Yp, Xl, Yl);
-            this.Dx = dParams[0];
-            this.Dy = dParams[1];
+            double dx = dParams[0];
+            double dy = dParams[1];
             double hMax = Double.parseDouble(hMaxText.getText());
             double hMin = Double.parseDouble(hMinText.getText());
             double[] chosenCamera = cameraMap.get(cameraComboBox.getValue());
             double[] chosenPlane = planeMap.get(planeComboBox.getValue());
             double maxPlaneLevel = chosenPlane[2];
-            this.f = chosenCamera[3];
+            double f = chosenCamera[3];
             double cyklPracy = chosenCamera[4];
-            this.px = chosenCamera[2];
+            double px = chosenCamera[2];
             double planeMaxSpeed = chosenPlane[1];
             double planeMinSpeed = chosenPlane[0];
             double averagePlaneSpeed = (planeMaxSpeed + planeMinSpeed)/2;
             double lx = chosenCamera[0];
             double ly = chosenCamera[1];
-            this.absoluteHeight = getAbsoluteHeight(this.GSD, this.f, this.px, hMax, hMin);
+            this.absoluteHeight = getAbsoluteHeight(GSD, f, px, hMax, hMin);
             if(this.absoluteHeight> maxPlaneLevel){
                 overLevelAlert();
             }
             this.p = Double.parseDouble(pText.getText());
             this.q = Double.parseDouble(qText.getText());
-            double[] nParams = getNParams(this.GSD, ly, lx, this.p, this.q, this.Dx, this.Dy, planeMaxSpeed);
-            this.nX = nParams[0];
-            this.nY = nParams[1];
+            double[] nParams = getNParams(GSD, ly, lx, this.p, this.q, dx, dy, planeMaxSpeed);
+            double nX = nParams[0];
+            double nY = nParams[1];
             if(cyklPracy >nParams[2]){
                 showAlert("Przekroczono cykl pracy", "Delta t jest mniejsza od cyklu pracy");
             }
-            this.liczbaZdjec = (int)(this.nX * this.nY);
+            int liczbaZdjec = (int) (nX * nY);
+            String formattedTime;
             if(!this.northSouth){
-                double totalDistance = this.Dx * this.nY;
-                double totalTime = totalDistance/averagePlaneSpeed + (this.nY-1)*((double) 140 /60);
-                this.formattedTime = convertSeconds(totalTime);
+                double totalDistance = dx * nY;
+                double totalTime = totalDistance/averagePlaneSpeed + (nY -1)*((double) 140 /60);
+                formattedTime = convertSeconds(totalTime);
             }
             else{
-                double totalDistance = this.Dy * this.nY;
-                double totalTime = totalDistance/averagePlaneSpeed + (this.nY-1)*((double) 140 /60);
-                this.formattedTime = convertSeconds(totalTime);
+                double totalDistance = dy * nY;
+                double totalTime = totalDistance/averagePlaneSpeed + (nY -1)*((double) 140 /60);
+                formattedTime = convertSeconds(totalTime);
             }
-            flightParams = new FlightParams(this.liczbaZdjec, this.nY, this.nX, this.formattedTime, this.p,this.q, this.northSouth, this.Dx,this.Dy, this.Lx,this.Ly,this.pChanged,this.qChanged);
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
-            stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-            scene=new Scene(root);
+            flightParams = new FlightParams(liczbaZdjec, nY, nX, formattedTime, this.p,this.q, this.northSouth,this.pChanged,this.qChanged);
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("SecondScene.fxml")));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
         }
